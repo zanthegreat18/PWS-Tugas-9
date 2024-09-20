@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Halaman Login</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f4f4f4;
+        color: #333;
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .login-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+      }
+
+      .login-container h2 {
+        margin-bottom: 30px;
+        color: #4a90e2;
+        font-size: 28px;
+      }
+
+      .login-container input {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      .login-container button {
+        width: 100%;
+        background-color: #4a90e2;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .login-container button:hover {
+        background-color: #357ab8;
+      }
+
+      .error-message {
+        color: red;
+        margin-bottom: 20px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <h2 style="height: 100%;">LOGIN</h2>
+      <div class="error-message" id="error-message">
+        Username atau password salah
+      </div>
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <script>
+      function login() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorMessage = document.getElementById('error-message');
+
+        // Daftar pengguna dengan username, password, dan peran
+        const users = [
+          { username: 'admin', password: 'admin123', role: 'admin' },
+          { username: 'Ojan', password: 'karyawan123', role: 'karyawan' },
+          { username: 'Defarel', password: 'karyawan123', role: 'karyawan' },
+          { username: 'Rizki', password: 'karyawan123', role: 'karyawan' },
+          { username: 'Raffi', password: 'karyawan123', role: 'karyawan' },
+        ];
+
+        // Mencari pengguna yang cocok
+        const user = users.find(
+          (u) => u.username === username && u.password === password
+        );
+
+        if (user) {
+          // Redirect ke halaman dashboard sesuai peran
+          if (user.role === 'admin') {
+            window.location.href = `Dashbord.html?username=${user.username}`;
+          } else if (user.role === 'karyawan') {
+            window.location.href = `Dashbord2.html?username=${user.username}`;
+          }
+        } else {
+          // Tampilkan pesan error
+          errorMessage.style.display = 'block';
+        }
+      }
+    </script>
+  </body>
+</html>

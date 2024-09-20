@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Buku</title>
+    <style>
+        /* Styling tetap sama seperti sebelumnya */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        .background-img {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./photo/backgroundweb1.jpg'); 
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar {
+            width: 0px;
+        }
+        h1, h2 {
+            color: #fff;
+            text-align: center;
+        }
+        .form-box, .table-box {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        form {
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            color: #fff;
+            background-color: #007bff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            background-color: #343a40;
+            color: #fff;
+        }
+        td button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #007bff;
+            font-size: 12px;
+        }
+        td button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-img"></div>
+
+    <div class="container">
+        <h1>Kelola Buku</h1>
+
+        <!-- Form untuk menambah buku -->
+        <div class="form-box">
+            <h2>Tambah/Edit Buku</h2>
+            <form id="book-form" enctype="multipart/form-data">
+                <input type="hidden" id="id_buku" name="id_buku"> <!-- Input tersembunyi untuk ID buku (untuk edit) -->
+                <div class="form-group">
+                    <label for="judul">Judul Buku:</label>
+                    <input type="text" id="judul" name="judul" required>
+                </div>
+                <div class="form-group">
+                    <label for="pengarang">Pengarang:</label>
+                    <input type="text" id="pengarang" name="pengarang" required>
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre:</label>
+                    <input type="text" id="genre" name="genre" required>
+                </div>
+                <div class="form-group">
+                    <label for="gambar">Upload Gambar:</label>
+                    <input type="file" id="gambar" name="gambar" accept="image/*">
+                </div>
+                <button type="submit" class="btn" id="submit-btn">Simpan Buku</button>
+            </form>
+        </div>
+
+        <!-- Tabel untuk menampilkan data buku -->
+        <div class="table-box">
+            <h2>Daftar Buku</h2>
+            <table id="book-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Pengarang</th>
+                        <th>Genre</th>
+                        <th>Gambar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data buku akan ditambahkan di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('book-form');
+            const tableBody = document.querySelector('#book-table tbody');
+            const submitBtn = document.getElementById('submit-btn');
+            let isEditing = false; // Status untuk mengetahui apakah sedang mengedit buku
+
+            // Load buku saat halaman dimuat
+            function loadBooks() {
+                fetch('/api/buku')
+                    .then(response => response.json())
+                    .then(books => {
+                        tableBody.innerHTML = ''; // Kosongkan tabel sebelum menambah data
+                        books.forEach(book => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${book.id_buku}</td>
+                                <td>${book.judul}</td>
+                                <td>${book.pengarang}</td>
+                                <td>${book.genre}</td>
+                                <td><img src="/uploads/${book.gambar}" alt="${book.judul}" style="width: 50px; height: auto;"></td>
+                                <td>
+                                    <button onclick="editBook(${book.id_buku})">Edit</button>
+                                    <button onclick="deleteBook(${book.id_buku})">Hapus</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    });
+            }
+
+            // Kirim form untuk menambah atau mengedit buku
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(form);
+                const url = isEditing ? `/api/buku/${formData.get('id_buku')}` : '/api/buku'; // Tentukan URL berdasarkan mode
+                const method = isEditing ? 'PUT' : 'POST'; // Tentukan metode HTTP
+
+                fetch(url, {
+                    method: method,
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message);
+                    loadBooks(); // Muat ulang data buku
+                    form.reset(); // Reset form
+                    isEditing = false; // Kembali ke mode menambah
+                    submitBtn.textContent = 'Simpan Buku'; // Ubah teks tombol kembali ke Simpan
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // Fungsi untuk mengisi form dengan data buku saat edit
+            window.editBook = function(id) {
+                fetch(`/api/buku/${id}`)
+                    .then(response => response.json())
+                    .then(book => {
+                        document.getElementById('id_buku').value = book.id_buku;
+                        document.getElementById('judul').value = book.judul;
+                        document.getElementById('pengarang').value = book.pengarang;
+                        document.getElementById('genre').value = book.genre;
+                        isEditing = true;
+                        submitBtn.textContent = 'Update Buku'; // Ubah teks tombol menjadi "Update"
+                    })
+                    .catch(error => console.error('Error:', error));
+            };
+
+            // Hapus buku berdasarkan ID
+            window.deleteBook = function(id) {
+                fetch(`/api/buku/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message);
+                    loadBooks(); // Muat ulang data buku
+                })
+                .catch(error => console.error('Error:', error));
+            };
+
+            // Muat data buku saat halaman dimuat
+            loadBooks();
+        });
+    </script>
+</body>
+</html>

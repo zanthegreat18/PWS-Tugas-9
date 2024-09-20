@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Buku</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .background {
+            background: url('./photo/backgroundweb2.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+
+        .book-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .book-item {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            text-align: center;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .book-item img {
+            width: 180px; 
+            height: 250px; 
+            object-fit: cover; 
+            border-radius: 5px;
+        }
+
+        .book-item h3 {
+            margin: 10px 0 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .book-item p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #4a90e2;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="container">
+            <h2>Daftar Buku</h2>
+            <div class="book-box" id="buku-box">
+                <!-- Data buku akan dimuat di sini melalui server.js -->
+            </div>
+            <a href="index.html" class="back-link">Kembali ke Halaman Utama</a>
+        </div>
+    </div>
+    <script>
+        async function fetchBuku() {
+            const response = await fetch('/api/buku');
+            const data = await response.json();
+            const box = document.getElementById('buku-box');
+            data.forEach(buku => {
+                const item = document.createElement('div');
+                item.className = 'book-item';
+                item.innerHTML = `
+                    <img src="/uploads/${buku.gambar}" alt="${buku.judul}">
+                    <h3>${buku.judul}</h3>
+                    <p>Pengarang: ${buku.pengarang}</p>
+                    <p>Genre: ${buku.genre}</p>
+                `;
+                box.appendChild(item);
+            });
+        }
+
+        fetchBuku();
+    </script>
+</body>
+</html>
